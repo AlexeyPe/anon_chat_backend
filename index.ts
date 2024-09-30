@@ -1,10 +1,11 @@
-const express = require('express');
+const express = require('express')
 const http = require('http')
 const socket = require('socket.io')
 
 const app = express();
 const server = http.createServer(app)
 const io = socket(server)
+app.use(express.json())
 
 const port = process.env.PORT || 3000;
 
@@ -22,11 +23,30 @@ app.get('/getUserName/:id', (req:any, res:any) => {
 
 app.get('/getMessages', (req:any, res:any) => {
     if (db.has("messages")) {
-        res.json({messages: db.get("messages")})
+        const result = db.get("messages").map((item:any) => {
+            item.userName = getUserName(item.id)
+            return item
+        })
+        res.json({messages: result})
     } else {
         db.set("messages", [])
         res.json({messages: []})
     }
+})
+
+app.post('/delteAllMessages', (req:any, res:any) => {
+    db.set("messages", [])
+    res.status(200).json('success')
+})
+
+app.post('/createMessage', (req:any, res:any) => {
+	const messages = db.get("messages")
+    messages.push({
+		id: req.body.id,
+		message: req.body.message,
+		dateUTC: new Date().getTime()
+	});
+    res.status(200).json('success')
 })
 
 io.on('connection', () => { 
