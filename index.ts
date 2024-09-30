@@ -20,6 +20,15 @@ app.get('/getUserName/:id', (req:any, res:any) => {
     }
 })
 
+app.get('/getMessages', (req:any, res:any) => {
+    if (db.has("messages")) {
+        res.json({messages: db.get("messages")})
+    } else {
+        db.set("messages", [])
+        res.json({messages: []})
+    }
+})
+
 io.on('connection', () => { 
     console.log(`cliet connection success!🤝`)
 });
