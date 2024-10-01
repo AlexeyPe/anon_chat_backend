@@ -1,5 +1,5 @@
-const express = require('express')
-const http = require('http')
+import express, { Request, Response } from 'express'
+import http from 'http';
 const socket = require('socket.io')
 
 const app = express();
@@ -9,9 +9,9 @@ app.use(express.json())
 
 const port = process.env.PORT || 3000;
 
-app.get('/', (req:any, res:any) => res.json({hi: "!"}));
+app.get('/', (req:Request, res:any) => res.json({hi: "!"}));
 
-app.get('/getUserName/:id', (req:any, res:any) => {
+app.get('/getUserName/:id', (req:Request, res:any) => {
     const id = Number(req.params.id)
     // console.log(`getUserName, id:${id}, Number(req.params.id):${Number(req.params.id)}`)
     if (Number.isNaN(id)) {
@@ -21,7 +21,7 @@ app.get('/getUserName/:id', (req:any, res:any) => {
     }
 })
 
-app.get('/getMessages', (req:any, res:any) => {
+app.get('/getMessages', (req:Request, res:any) => {
     if (db.has("messages")) {
         const result = db.get("messages").map((item:any) => {
             item.userName = getUserName(item.id)
@@ -34,13 +34,13 @@ app.get('/getMessages', (req:any, res:any) => {
     }
 })
 
-app.post('/delteAllMessages', (req:any, res:any) => {
+app.post('/delteAllMessages', (req:Request, res:any) => {
     db.set("messages", [])
     res.status(200).json('success')
     io.sockets.emit("updateMessages", [])
 })
 
-app.post('/createMessage', (req:any, res:any) => {
+app.post('/createMessage', (req:Request, res:any) => {
 	const messages = db.get("messages")
     messages.push({
 		id: req.body.id,
