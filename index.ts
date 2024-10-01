@@ -37,6 +37,7 @@ app.get('/getMessages', (req:any, res:any) => {
 app.post('/delteAllMessages', (req:any, res:any) => {
     db.set("messages", [])
     res.status(200).json('success')
+    io.sockets.emit("updateMessages", [])
 })
 
 app.post('/createMessage', (req:any, res:any) => {
@@ -47,10 +48,14 @@ app.post('/createMessage', (req:any, res:any) => {
 		dateUTC: new Date().getTime()
 	});
     res.status(200).json('success')
+    io.sockets.emit("updateMessages", db.get("messages").map((item:any) => {
+        item.userName = getUserName(item.id)
+        return item
+    }))
 })
 
 io.on('connection', () => { 
-    console.log(`cliet connection success!🤝`)
+    // console.log(`cliet connection 🤝`)
 });
 
 // app.listen(port, () => console.log(`Server running on ${port}, http://localhost:${port}`));
